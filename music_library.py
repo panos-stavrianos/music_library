@@ -20,7 +20,7 @@ else:
 class MusicLibrary(object):
     def __init__(self, master):
         self.paths = []
-        self.songs = pd.read_csv("songs.csv", keep_default_na=False)
+        self.songs = pd.read_csv("songs.csv")
         master.bind("<Return>", self.open_folder)
         master.geometry('950x500')
         master.resizable(True, True)
@@ -97,14 +97,15 @@ class MusicLibrary(object):
 
         self.list.event_generate("<<ListboxSelect>>")
         text = (self.text.get() + event.char).replace("\n", "").replace("\r", "")
-        self.songs['score'] = self.songs.apply(lambda x: fuzz.ratio(x['full_text'], text), axis=1)
-        possible_songs = self.songs.sort_values(by=['score'], ascending=False).head(200)
+        songs = self.songs
+        songs['score'] = songs.apply(lambda x: fuzz.ratio(x['full_text'], text), axis=1)
+        songs = songs.sort_values(by=['score'], ascending=False).head(200)
         self.list.delete(0, 'end')
         self.paths = []
 
-        for i, song in possible_songs.iterrows():
-            self.paths.append(song['path'])
-            self.list.insert(i + 1,
+        for i, song in songs.iterrows():
+            self.paths.insert(i, song['path'])
+            self.list.insert(i,
                              '{} - {} - {}'.format(song['artist'], song['album'], song['title']))
 
         self.list.select_clear(0, 'end')
