@@ -60,14 +60,14 @@ class MusicLibrary(object):
         # create a pulldown menu, and add it to the menu bar
         self.filemenu = Menu(self.menubar, tearoff=0, bg='gray13', fg='gray93')
         self.filemenu.add_command(label="Refresh Library", command=self.refresh_library)
-        self.filemenu.add_command(label="Save", command=self.open_help)
+        self.filemenu.add_command(label="Help", command=self.open_help)
         self.filemenu.add_separator()
         self.filemenu.add_command(label="Exit", command=master.quit)
         self.menubar.add_cascade(label="Settings", menu=self.filemenu)
         master.config(menu=self.menubar)
 
     def open_help(self):
-        webbrowser.open('http://example.com')
+        webbrowser.open('https://github.com/panos-stavrianos/music_library')
 
     def refresh_library(self):
         MsgBox = messagebox.askquestion('Refresh Library', 'This may take a while\nAre you sure you want to continue',
