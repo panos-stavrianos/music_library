@@ -9,7 +9,11 @@ from fuzzywuzzy import fuzz
 
 from index_music_library import index_music_library
 
-if os.path.exists("songs.csv"):
+if os.path.exists("file_paths.txt"):
+    start_refresh = True
+    index_music_library()
+
+if os.path.exists("songs_final.csv"):
     start_refresh = False
 else:
     start_refresh = True
@@ -20,7 +24,9 @@ else:
 class MusicLibrary(object):
     def __init__(self, master):
         self.paths = []
-        self.songs = pd.read_csv("songs.csv")
+        self.songs = pd.read_csv("songs_final.csv")
+        self.songs = self.songs.fillna('')
+
         master.bind("<Return>", self.open_folder)
         master.geometry('950x500')
         master.resizable(True, True)
@@ -94,7 +100,6 @@ class MusicLibrary(object):
             self.popup_menu.grab_release()
 
     def callback(self, event):
-
         self.list.event_generate("<<ListboxSelect>>")
         text = (self.text.get() + event.char).replace("\n", "").replace("\r", "")
         songs = self.songs
@@ -102,9 +107,10 @@ class MusicLibrary(object):
         songs = songs.sort_values(by=['score'], ascending=False).head(200)
         self.list.delete(0, 'end')
         self.paths = []
-
+        print(songs.to_markdown())
         for i, song in songs.iterrows():
             self.paths.insert(i, song['path'])
+            print(song['path'])
             self.list.insert(i,
                              '{} - {} - {}'.format(song['artist'], song['album'], song['title']))
 
@@ -123,6 +129,8 @@ class MusicLibrary(object):
     def add_to_vlc(self, event=None):
         try:
             song_path = self.paths[self.list.curselection()[0]]
+            print(self.list.curselection()[0])
+            print(self.paths)
             os.system('vlc --one-instance --playlist-enqueue --no-playlist-autostart "{}" &'.format(song_path))
         except:
             pass
